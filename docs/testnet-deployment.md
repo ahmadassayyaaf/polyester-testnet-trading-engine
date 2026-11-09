@@ -10,3 +10,5 @@
 8. To roll back, stop the process, run cancel-all from the Testnet UI/API if necessary, disarm DMS, preserve the SQLite file, and restore the previous code/dependencies.
 
 This guide does not authorize live mutation by itself. Credentials, funding, and execution remain operator-controlled.
+
+For persistent VPS deployment with automatic restart, secret permissions, journald, and graceful systemd shutdown, see [systemd VPS guide](systemd-vps.md).

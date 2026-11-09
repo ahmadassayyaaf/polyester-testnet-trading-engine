@@ -24,7 +24,7 @@ set -a
 set +a
 ```
 
-Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
+Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md), termasuk [deployment systemd pada VPS](docs/systemd-vps.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
 
 ```bash
 python scripts/healthcheck.py
@@ -51,7 +51,7 @@ Sebelum itu, pastikan Pair policy API key mengizinkan spot trading, saldo test t
 - `engine.py`: loop, DMS, retry, persistence, dan shutdown.
 - `storage.py`: state SQLite untuk restart recovery.
 - `tests/`: unit dan offline integration tests.
-- `docs/`: contract notes, deployment, API key/.env, dan compliance.
+- `docs/`: contract notes, deployment, API key/.env, systemd VPS, dan compliance.
 
 ## Official references
 
