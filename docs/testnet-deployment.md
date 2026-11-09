@@ -1,6 +1,6 @@
 # Testnet deployment guide
 
-1. Create a dedicated Polyester Testnet Subaccount and API key. Grant only the spot-trading permission and Pair scope required by the test.
+1. Read [API key and `.env` setup](api-key-and-env.md), then create a dedicated Polyester Testnet Subaccount and API key. Grant only the spot-trading permission and Pair scope required by the test.
 2. Install the pinned dependencies from `pyproject.toml` in a Python 3.11+ virtual environment.
 3. Copy `.env.example` to `.env`, set the key, Subaccount, symbol, and conservative quantity. Keep `ENABLE_LIVE_TRADING=false`.
 4. Run `python scripts/healthcheck.py`, then `python -m pytest -q` and `python -m compileall -q src tests`.

@@ -13,9 +13,18 @@ python3.11 -m venv .venv
 . .venv/bin/activate
 pip install -e '.[test]'
 cp .env.example .env
+chmod 600 .env
 ```
 
-Isi `.env` hanya dengan kredensial API key Testnet yang terikat ke Subaccount. Jangan commit `.env` atau private key. Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
+Isi `.env` hanya dengan kredensial API key Testnet yang terikat ke Subaccount. Jangan commit `.env` atau private key. Script membaca environment process, jadi load `.env` pada shell yang sama sebelum menjalankan pemeriksaan:
+
+```bash
+set -a
+. ./.env
+set +a
+```
+
+Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
 
 ```bash
 python scripts/healthcheck.py
@@ -42,7 +51,7 @@ Sebelum itu, pastikan Pair policy API key mengizinkan spot trading, saldo test t
 - `engine.py`: loop, DMS, retry, persistence, dan shutdown.
 - `storage.py`: state SQLite untuk restart recovery.
 - `tests/`: unit dan offline integration tests.
-- `docs/`: contract notes, deployment, dan compliance.
+- `docs/`: contract notes, deployment, API key/.env, dan compliance.
 
 ## Official references
 
