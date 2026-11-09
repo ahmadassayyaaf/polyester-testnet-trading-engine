@@ -1,0 +1,2 @@
+[console_scripts]
+polyester-bot = polyester_bot.cli:main

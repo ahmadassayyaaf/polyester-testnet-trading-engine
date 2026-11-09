@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: polyester-testnet-trading-engine
+Version: 0.1.0
+Summary: Testnet-only, safety-first Polyester market-making engine
+Requires-Python: >=3.11
+Requires-Dist: polyester-sdk==0.14.0
+Requires-Dist: aiosqlite<1,>=0.20
+Provides-Extra: test
+Requires-Dist: pytest<9,>=8; extra == "test"
+Requires-Dist: pytest-asyncio<1,>=0.24; extra == "test"

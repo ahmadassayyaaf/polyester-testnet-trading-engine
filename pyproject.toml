@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polyester-testnet-trading-engine"
+version = "0.1.0"
+description = "Testnet-only, safety-first Polyester market-making engine"
+requires-python = ">=3.11"
+dependencies = ["polyester-sdk==0.14.0", "aiosqlite>=0.20,<1"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9", "pytest-asyncio>=0.24,<1"]
+
+[project.scripts]
+polyester-bot = "polyester_bot.cli:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
