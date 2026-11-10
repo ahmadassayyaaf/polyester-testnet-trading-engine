@@ -38,6 +38,7 @@ class Settings:
     client_order_prefix: str = "mm-"
     book_depth: int = 20
     requote_ticks: int = 2
+    quote_notional_cap: Decimal | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -58,6 +59,11 @@ class Settings:
             client_order_prefix=os.getenv("BOT_CLIENT_ORDER_PREFIX", "mm-"),
             book_depth=int(os.getenv("BOT_BOOK_DEPTH", "20")),
             requote_ticks=int(os.getenv("BOT_REQUOTE_TICKS", "2")),
+            quote_notional_cap=(
+                _decimal("BOT_QUOTE_NOTIONAL_CAP", os.environ["BOT_QUOTE_NOTIONAL_CAP"])
+                if os.getenv("BOT_QUOTE_NOTIONAL_CAP") is not None
+                else None
+            ),
         )
         settings.validate()
         return settings
@@ -77,6 +83,8 @@ class Settings:
             raise ValueError("BOT_BOOK_DEPTH must be one of 1, 20, 50, 200, or 500")
         if self.requote_ticks < 1:
             raise ValueError("BOT_REQUOTE_TICKS must be positive")
+        if self.quote_notional_cap is not None and self.quote_notional_cap <= 0:
+            raise ValueError("BOT_QUOTE_NOTIONAL_CAP must be positive when set")
         if not 10 <= self.dms_timeout_seconds <= 120:
             raise ValueError("dead-man timeout must be between 10 and 120 seconds")
         if self.dms_refresh_seconds >= self.dms_timeout_seconds:

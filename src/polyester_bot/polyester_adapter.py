@@ -29,7 +29,10 @@ class PolyesterAdapter:
     async def load_rules(self, symbol: str) -> PairRules:
         await self._client.wait_for_catalogs()
         config = await self._client.market_data.get_spot_config()
-        rules = PairRules.from_raw(next(p for p in config.raw["pairs"] if p["symbol"] == symbol))
+        raw = next(p for p in config.raw["pairs"] if p["symbol"] == symbol)
+        asset_ids = {asset["asset"]: int(asset["ledgerId"]) for asset in config.raw.get("assets", [])}
+        raw = dict(raw, baseAssetId=asset_ids.get(raw.get("baseAsset")), quoteAssetId=asset_ids.get(raw.get("quoteAsset")))
+        rules = PairRules.from_raw(raw)
         self._symbol_id = rules.symbol_id
         return rules
 

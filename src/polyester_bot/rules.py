@@ -34,11 +34,15 @@ class PairRules:
     max_notional: Decimal | None = None
     listing_at: datetime | None = None
     delisting_at: datetime | None = None
+    base_asset_id: int | None = None
+    quote_asset_id: int | None = None
 
     @classmethod
     def from_raw(cls, raw: dict[str, Any]) -> "PairRules":
         return cls(
             symbol=raw["symbol"], symbol_id=int(raw["symbolId"]), status=str(raw["status"]),
+            base_asset_id=int(raw["baseAssetId"]) if raw.get("baseAssetId") is not None else None,
+            quote_asset_id=int(raw["quoteAssetId"]) if raw.get("quoteAssetId") is not None else None,
             tick_size=_d(raw["tickSize"]), step_size=_d(raw["stepSize"]),
             min_qty=_d(raw.get("minQtyBase")), min_notional=_d(raw.get("minNotionalQuote")),
             max_qty=_d(raw["maxLimitQtyBase"]) if raw.get("maxLimitQtyBase") is not None else None,
