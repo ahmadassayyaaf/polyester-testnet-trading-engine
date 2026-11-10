@@ -46,6 +46,34 @@ class PolyesterAdapter:
         result = await self._client.orders.list_open()
         return [self._order(o) for o in result.orders if o.symbol_id == self._symbol_id]
 
+    async def reconcile_owned_orders(self, symbol: str, prefix: str) -> list[OrderSnapshot]:
+        return [order for order in await self.open_orders(symbol) if order.client_order_id.startswith(prefix)]
+
+    async def replace_quotes(self, replacements: list[tuple[OrderSnapshot, Quote]], request_id: str) -> list[OrderSnapshot]:
+        from polyester.models.order_key import ClientOrderId
+
+        items = [
+            {
+                "key": ClientOrderId(order.client_order_id),
+                "new_price": str(quote.price),
+                "new_qty": str(quote.qty),
+                "new_client_order_id": quote.client_order_id,
+            }
+            for order, quote in replacements
+        ]
+        if not items:
+            return []
+        result = await self._client.orders.batch_replace(symbol=self._symbol, items=items, request_id=request_id)
+        by_index = {item.item_index: item for item in result.results}
+        replaced: list[OrderSnapshot] = []
+        for index, (old, quote) in enumerate(replacements):
+            item = by_index.get(index)
+            if item is None or str(item.status).lower() not in {"accepted", "working", "ok"}:
+                continue
+            order_id = str(item.replacement_order_id or old.order_id)
+            replaced.append(OrderSnapshot(order_id, quote.client_order_id, old.symbol, quote.side, quote.price, quote.qty, old.filled_qty, "working", old.version + 1))
+        return replaced
+
     async def balances(self) -> list[AssetBalance]:
         from polyester import format_ledger_u128
         result = await self._client.balances.list()

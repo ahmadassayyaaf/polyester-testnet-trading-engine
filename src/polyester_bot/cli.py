@@ -11,5 +11,13 @@ def main() -> None:
     settings = Settings.from_env(); configure_logging(settings.log_level)
     async def run():
         async with PolyesterAdapter(settings) as adapter:
-            await TradingEngine(settings, adapter, Store(settings.db_path), MarketMaker(settings.symbol, settings.qty, settings.half_spread_bps, settings.max_inventory)).run()
+            strategy = MarketMaker(
+                settings.symbol,
+                settings.qty,
+                settings.half_spread_bps,
+                settings.max_inventory,
+                settings.client_order_prefix,
+                settings.quote_notional_cap,
+            )
+            await TradingEngine(settings, adapter, Store(settings.db_path), strategy).run()
     asyncio.run(run())
