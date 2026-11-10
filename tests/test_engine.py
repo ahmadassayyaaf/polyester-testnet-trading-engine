@@ -9,19 +9,26 @@ from polyester_bot.strategy import MarketMaker
 
 class FakeExchange:
     def __init__(self):
-        self.placed = []; self.cancelled_all = 0; self.armed = 0; self.disarmed = 0
+        self.placed = []; self.orders = []; self.cancelled = []; self.cancelled_all = 0; self.armed = 0; self.disarmed = 0
     async def load_rules(self, symbol):
         return PairRules.from_raw(dict(symbol=symbol, symbolId=1, status='ENABLED', tickSize='0.01', stepSize='0.001', minQtyBase='0.01', minNotionalQuote='5'))
     async def best_bid_ask(self, symbol): return Decimal('100'), Decimal('101')
-    async def open_orders(self, symbol): return []
+    async def open_orders(self, symbol): return [order for order in self.orders if order.order_id not in {item.order_id for item in self.cancelled}]
+    async def reconcile_owned_orders(self, symbol, prefix): return [order for order in await self.open_orders(symbol) if order.client_order_id.startswith(prefix)]
     async def place(self, quote):
-        self.placed.append(quote); return OrderSnapshot(f'o{len(self.placed)}', quote.client_order_id, 'BTC-USDT', quote.side, quote.price, quote.qty, status='accepted')
-    async def cancel(self, order): pass
+        self.placed.append(quote)
+        order = OrderSnapshot(f'o{len(self.placed)}', quote.client_order_id, 'BTC-USDT', quote.side, quote.price, quote.qty, status='accepted')
+        self.orders.append(order)
+        return order
+    async def cancel(self, order): self.cancelled.append(order)
     async def arm_dead_man(self, timeout_seconds): self.armed += 1
     async def disarm_dead_man(self): self.disarmed += 1
     async def cancel_all(self, symbol): self.cancelled_all += 1
     async def events(self, symbol):
         if False: yield
+
+class StuckCleanupExchange(FakeExchange):
+    async def open_orders(self, symbol): return list(self.orders)
 
 def settings(live):
     return Settings(None, None, None, 'BTC-USDT', Decimal('0.1'), Decimal('20'), Decimal('1'), 2, ':memory:', 'INFO', 30, 10, live)
@@ -36,4 +43,10 @@ async def test_dry_run_never_places_orders(tmp_path):
 async def test_live_once_cancels_and_disarms(tmp_path):
     exchange = FakeExchange(); store = Store(str(tmp_path/'x.db'))
     await TradingEngine(settings(True), exchange, store, MarketMaker('BTC-USDT', Decimal('0.1'), Decimal('20'), Decimal('1'))).run(once=True)
-    assert len(exchange.placed) == 2 and exchange.cancelled_all == 1 and exchange.disarmed == 1
+    assert len(exchange.placed) == 2 and len(exchange.cancelled) == 2 and exchange.cancelled_all == 0 and exchange.disarmed == 1
+
+@pytest.mark.asyncio
+async def test_shutdown_leaves_dead_man_armed_when_cleanup_is_unconfirmed(tmp_path):
+    exchange = StuckCleanupExchange(); store = Store(str(tmp_path/'x.db'))
+    await TradingEngine(settings(True), exchange, store, MarketMaker('BTC-USDT', Decimal('0.1'), Decimal('20'), Decimal('1'))).run(once=True)
+    assert len(exchange.cancelled) == 2 and exchange.disarmed == 0
