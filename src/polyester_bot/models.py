@@ -28,6 +28,34 @@ class OrderSnapshot:
     qty: Decimal
     filled_qty: Decimal = Decimal("0")
     status: str = "new"
+    version: int = 0
+
+
+@dataclass(frozen=True)
+class AssetBalance:
+    asset_id: int
+    available: Decimal
+    reserved: Decimal = Decimal("0")
+    trading_revision: int = 0
+
+
+@dataclass(frozen=True)
+class BookSnapshot:
+    symbol: str
+    book_seq: str
+    best_bid: Decimal | None
+    best_ask: Decimal | None
+    fresh: bool = True
+
+
+@dataclass(frozen=True)
+class OrderEvent:
+    order_id: str
+    version: int
+    kind: str
+    fill: Fill | None = None
+    cancel_reason: str | None = None
+    replacement_order_id: str | None = None
 
 
 @dataclass(frozen=True)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -34,6 +35,9 @@ class Settings:
     dms_refresh_seconds: int
     enable_live_trading: bool
     environment: str = "testnet"
+    client_order_prefix: str = "mm-"
+    book_depth: int = 20
+    requote_ticks: int = 2
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -51,6 +55,9 @@ class Settings:
             dms_timeout_seconds=int(os.getenv("BOT_DMS_TIMEOUT_SECONDS", "30")),
             dms_refresh_seconds=int(os.getenv("BOT_DMS_REFRESH_SECONDS", "10")),
             enable_live_trading=os.getenv("ENABLE_LIVE_TRADING", "false").lower() == "true",
+            client_order_prefix=os.getenv("BOT_CLIENT_ORDER_PREFIX", "mm-"),
+            book_depth=int(os.getenv("BOT_BOOK_DEPTH", "20")),
+            requote_ticks=int(os.getenv("BOT_REQUOTE_TICKS", "2")),
         )
         settings.validate()
         return settings
@@ -64,6 +71,12 @@ class Settings:
             raise ValueError("quantity and max inventory must be positive")
         if self.max_open_orders < 1:
             raise ValueError("BOT_MAX_OPEN_ORDERS must be positive")
+        if not 1 <= len(self.client_order_prefix) <= 20 or not re.fullmatch(r"[A-Za-z0-9._:/-]+", self.client_order_prefix):
+            raise ValueError("BOT_CLIENT_ORDER_PREFIX must be 1-20 ASCII letters, digits, '.', '_', ':', '/', or '-'")
+        if self.book_depth not in {1, 20, 50, 200, 500}:
+            raise ValueError("BOT_BOOK_DEPTH must be one of 1, 20, 50, 200, or 500")
+        if self.requote_ticks < 1:
+            raise ValueError("BOT_REQUOTE_TICKS must be positive")
         if not 10 <= self.dms_timeout_seconds <= 120:
             raise ValueError("dead-man timeout must be between 10 and 120 seconds")
         if self.dms_refresh_seconds >= self.dms_timeout_seconds:
