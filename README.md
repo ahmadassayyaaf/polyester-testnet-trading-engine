@@ -24,7 +24,7 @@ set -a
 set +a
 ```
 
-Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md), [production reliability controls](docs/production-reliability.md), dan [deployment systemd pada VPS](docs/systemd-vps.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
+Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md), [production reliability controls](docs/production-reliability.md), dan [deployment systemd pada VPS](docs/systemd-vps.md). Untuk merge feature branch setelah review, gunakan [merge-after-review guide](docs/merge-after-review.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
 
 ```bash
 python scripts/healthcheck.py
