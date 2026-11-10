@@ -4,7 +4,7 @@ Bot market-making asynchronous yang **khusus Polyester Testnet**. Proyek ini mem
 
 ## Status implementasi
 
-Fondasi offline dan adapter SDK tersedia: konfigurasi fail-closed, validasi pair dinamis, Decimal arithmetic, retry idempotent, SQLite persistence, strategi dua sisi post-only, dead-man switch wrapper, cancel-all shutdown, dan private-stream boundary. **Credentialed Testnet mutation belum dijalankan pada workspace ini**, sehingga acceptance criteria live belum boleh dianggap terpenuhi.
+Fondasi offline dan adapter SDK tersedia: konfigurasi fail-closed, validasi pair dinamis, Decimal arithmetic, retry idempotent, SQLite persistence, independent balance-aware sizing, managed orderbook gate, versioned private-event boundary, targeted ownership cleanup, dan dead-man switch safety. **Credentialed Testnet mutation belum dijalankan pada workspace ini**, sehingga acceptance criteria live belum boleh dianggap terpenuhi.
 
 ## Instalasi
 
@@ -24,7 +24,7 @@ set -a
 set +a
 ```
 
-Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md), termasuk [deployment systemd pada VPS](docs/systemd-vps.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
+Panduan lengkap tersedia di [docs/api-key-and-env.md](docs/api-key-and-env.md), [production reliability controls](docs/production-reliability.md), dan [deployment systemd pada VPS](docs/systemd-vps.md). Jalankan pemeriksaan tanpa order dengan `ENABLE_LIVE_TRADING=false`.
 
 ```bash
 python scripts/healthcheck.py
@@ -48,7 +48,7 @@ Sebelum itu, pastikan Pair policy API key mengizinkan spot trading, saldo test t
 - `rules.py`: Pair rules dari `GetSpotConfig`, tanpa hardcode exchange rules.
 - `polyester_adapter.py`: satu-satunya boundary resmi `polyester-sdk`.
 - `strategy.py`: market-making post-only yang dapat diuji tanpa jaringan.
-- `engine.py`: loop, DMS, retry, persistence, dan shutdown.
+- `engine.py`: loop, managed-book gate, private events, DMS, retry, persistence, dan targeted shutdown.
 - `storage.py`: state SQLite untuk restart recovery.
 - `tests/`: unit dan offline integration tests.
 - `docs/`: contract notes, deployment, API key/.env, systemd VPS, dan compliance.
@@ -61,3 +61,7 @@ Sebelum itu, pastikan Pair policy API key mengizinkan spot trading, saldo test t
 - [Pair rules](https://testnet.polyester.com/docs/developer-docs/market-data/pairs-and-trading-rules)
 - [Batch orders](https://testnet.polyester.com/docs/developer-docs/shared-concepts/batch-orders)
 - [Dead-man switch](https://testnet.polyester.com/docs/developer-docs/shared-concepts/dead-man-switch)
+- [Two-sided quoting](https://testnet.polyester.com/docs/sdk/python/tutorials/two-sided-quoting)
+- [Portfolio tracker](https://testnet.polyester.com/docs/sdk/python/tutorials/portfolio-tracker)
+- [Private WebSocket](https://testnet.polyester.com/docs/developer-docs/connectrpc/private-websocket)
+- [Requests and idempotency](https://testnet.polyester.com/docs/sdk/python/concepts/requests-and-idempotency)

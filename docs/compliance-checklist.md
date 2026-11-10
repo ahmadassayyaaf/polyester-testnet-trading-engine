@@ -16,13 +16,15 @@
 - [ ] Unknown outcomes trigger reconciliation before a new logical order.
 - [ ] Self-trade prevention policy is configured at the venue/account level or passed explicitly when supported.
 - [ ] Maximum open orders and inventory exposure are enforced.
+- [ ] Client order prefix is unique to this bot process and is documented for operator cleanup.
 
 ## Operational safety
 
 - [ ] Dead-man switch is armed before quotes and refreshed with a new request ID.
-- [ ] Shutdown performs cancel-all, then disarms DMS.
+- [ ] Shutdown cancels only prefix-owned orders, confirms they disappear, and disarms DMS only after confirmation.
 - [ ] SQLite state is backed up before a version change.
 - [ ] Private stream disconnect causes reconciliation before quoting resumes.
+- [ ] Managed orderbook sequence gap pauses quoting until snapshot refresh.
 - [ ] Monitoring alerts on stale stream, DMS heartbeat failure, rejected orders, and unknown outcomes.
 
 ## Evidence levels
